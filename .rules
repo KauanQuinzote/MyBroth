@@ -1,0 +1,5 @@
+# MyBroth - Regras do Projeto (.rules)
+
+- **Regras Principais**: Consulte [docs/RULES.md](./docs/RULES.md) para diretrizes de arquitetura Feature-Based.
+- **Design System Apple**: Consulte [docs/DESIGN.md](./docs/DESIGN.md) para o guia de estilo Apple Minimalist e Política Zero Emojis.
+- **Especificações de Skills**: Siga sempre o repositório `skills/`.
