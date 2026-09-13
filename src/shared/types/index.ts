@@ -27,6 +27,7 @@ export interface WorkoutRoutine {
 export interface WorkoutSession {
   id: string;
   user_id: string;
+  routine_id?: string;
   routine_name: string;
   status: 'in_progress' | 'completed';
   current_exercise?: string;

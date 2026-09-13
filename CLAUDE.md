@@ -7,4 +7,4 @@
 ## Architecture Rules (.rules)
 - Siga a arquitetura **Feature-Based** em `src/features/` com exportações públicas via `index.ts`.
 - Recursos compartilhados em `src/shared/`.
-- Siga sempre as especificações em `skills/`.
+- Siga sempre as especificações em `docs/skills/`.

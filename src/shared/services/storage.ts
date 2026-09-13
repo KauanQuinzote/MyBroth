@@ -30,44 +30,7 @@ export const DEFAULT_PROFILES: BroProfile[] = [
   },
 ];
 
-export const DEFAULT_ROUTINES: WorkoutRoutine[] = [
-  {
-    id: 'routine-chest-triceps',
-    title: 'Peito & Tríceps Monstro',
-    target_muscle: 'Peito e Tríceps',
-    exercises: [
-      { id: 'ex-1', name: 'Supino Reto com Barra', defaultSets: 4, defaultReps: 10, targetMuscle: 'Peito' },
-      { id: 'ex-2', name: 'Supino Inclinado com Halteres', defaultSets: 3, defaultReps: 12, targetMuscle: 'Peito' },
-      { id: 'ex-3', name: 'Crossover na Polia', defaultSets: 3, defaultReps: 15, targetMuscle: 'Peito' },
-      { id: 'ex-4', name: 'Tríceps Testa', defaultSets: 4, defaultReps: 10, targetMuscle: 'Tríceps' },
-      { id: 'ex-5', name: 'Tríceps Corda', defaultSets: 3, defaultReps: 12, targetMuscle: 'Tríceps' },
-    ],
-  },
-  {
-    id: 'routine-back-biceps',
-    title: 'Costas & Bíceps de Aço',
-    target_muscle: 'Costas e Bíceps',
-    exercises: [
-      { id: 'ex-6', name: 'Puxada Frontal', defaultSets: 4, defaultReps: 10, targetMuscle: 'Costas' },
-      { id: 'ex-7', name: 'Remada Curvada com Barra', defaultSets: 4, defaultReps: 8, targetMuscle: 'Costas' },
-      { id: 'ex-8', name: 'Remada Baixa', defaultSets: 3, defaultReps: 12, targetMuscle: 'Costas' },
-      { id: 'ex-9', name: 'Rosca Direta', defaultSets: 4, defaultReps: 10, targetMuscle: 'Bíceps' },
-      { id: 'ex-10', name: 'Rosca Martelo', defaultSets: 3, defaultReps: 12, targetMuscle: 'Bíceps' },
-    ],
-  },
-  {
-    id: 'routine-legs-shoulders',
-    title: 'Perna & Ombro Insano',
-    target_muscle: 'Pernas e Ombros',
-    exercises: [
-      { id: 'ex-11', name: 'Agachamento Livre', defaultSets: 4, defaultReps: 8, targetMuscle: 'Pernas' },
-      { id: 'ex-12', name: 'Leg Press 45', defaultSets: 4, defaultReps: 10, targetMuscle: 'Pernas' },
-      { id: 'ex-13', name: 'Cadeira Extensora', defaultSets: 3, defaultReps: 15, targetMuscle: 'Pernas' },
-      { id: 'ex-14', name: 'Desenvolvimento com Halteres', defaultSets: 4, defaultReps: 10, targetMuscle: 'Ombros' },
-      { id: 'ex-15', name: 'Elevação Lateral', defaultSets: 4, defaultReps: 12, targetMuscle: 'Ombros' },
-    ],
-  },
-];
+export const DEFAULT_ROUTINES: WorkoutRoutine[] = [];
 
 export const LocalStorageService = {
   async getProfiles(): Promise<BroProfile[]> {
@@ -152,6 +115,22 @@ export const LocalStorageService = {
     const logs = await this.getSetLogs(sessionId);
     logs.push(log);
     await AsyncStorage.setItem(`${SETS_KEY}_${sessionId}`, JSON.stringify(logs));
+  },
+
+  async getLastExerciseLog(exerciseName: string): Promise<WorkoutSetLog | null> {
+    try {
+      const sessions = await this.getSessions();
+      for (const session of sessions) {
+        const logs = await this.getSetLogs(session.id);
+        const matchingLogs = logs.filter((l) => l.exercise_name === exerciseName);
+        if (matchingLogs.length > 0) {
+          return matchingLogs[matchingLogs.length - 1];
+        }
+      }
+      return null;
+    } catch {
+      return null;
+    }
   },
 
   // --- Presença em Tempo Real ---

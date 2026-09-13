@@ -19,6 +19,7 @@ interface WorkoutContextType {
   startRestTimer: (duration?: number) => void;
   addRoutine: (title: string, targetMuscle: string) => Promise<WorkoutRoutine>;
   addExerciseToRoutine: (routineId: string, name: string, sets: number, reps: number, muscle: string) => Promise<void>;
+  getLastExerciseLog: (exerciseName: string) => Promise<WorkoutSetLog | null>;
 }
 
 const WorkoutContext = createContext<WorkoutContextType>({} as WorkoutContextType);
@@ -150,6 +151,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const newSession: WorkoutSession = {
       id: `session_${Date.now()}`,
       user_id: activeProfile.id,
+      routine_id: routine.id,
       routine_name: routine.title,
       status: 'in_progress',
       current_exercise: routine.exercises[0]?.name || 'Exercício Inicial',
@@ -255,6 +257,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
         startRestTimer,
         addRoutine,
         addExerciseToRoutine,
+        getLastExerciseLog: LocalStorageService.getLastExerciseLog.bind(LocalStorageService),
       }}
     >
       {children}
