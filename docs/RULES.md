@@ -10,5 +10,12 @@
 - Consulte e siga rigorosamente as diretrizes contidas em `docs/DESIGN.md`.
 - É expressamente proibido o uso de emojis no aplicativo. Toda a iconografia deve ser vetorial (`lucide-react-native`).
 
-## 3. Integração com Skills
-- O desenvolvimento DEVE consultar e respeitar as especificações contidas no repositório `skills/`.
+## 3. Componentização Máxima e Limite de LOC (Matt Pocock Architecture)
+- **Componentes / Telas < 100 LOC**: Arquivos JSX/TSX de UI não devem ultrapassar 100 linhas de código.
+- **Divisão em Sub-componentes Top, Mid e Bottom**:
+  - Telas entre 100-150 LOC: Devem ser divididas em componentes `[Feature]Top` e `[Feature]Bottom`.
+  - Telas > 150 LOC: Devem ser divididas em `[Feature]Top`, `[Feature]Mid` e `[Feature]Bottom` (e sub-componentes específicos como Modais/Cards isolados).
+- **Responsabilidade Única**: O arquivo principal `Screen.tsx` de uma feature deve apenas orquestrar os sub-componentes e gerenciar estados globais.
+
+## 4. Integração com Skills
+- O desenvolvimento DEVE consultar e respeitar as especificações contidas no repositório `docs/skills/`.

@@ -16,7 +16,6 @@ export const HeaderBar: React.FC = () => {
         </View>
         <View>
           <Text className="text-slate-50 text-base font-bold tracking-tight">{activeProfile.name}</Text>
-          <Text className="text-slate-400 text-xs font-medium">Atleta</Text>
         </View>
       </View>
 
