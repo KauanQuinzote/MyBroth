@@ -37,8 +37,31 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [isTimerRunning, setIsTimerRunning] = useState(false);
 
   useEffect(() => {
-    LocalStorageService.getRoutines().then(setRoutines);
-  }, []);
+    if (!activeProfile) {
+      setRoutines([]);
+      return;
+    }
+    const loadRoutines = async () => {
+      if (isSupabaseConfigured && supabase) {
+        try {
+          const { data, error } = await supabase
+            .from('routines')
+            .select('*')
+            .eq('created_by', activeProfile.id);
+          if (!error && data) {
+            setRoutines(data as WorkoutRoutine[]);
+            return;
+          }
+        } catch (e) {
+          console.warn('Erro ao carregar fichas do Supabase:', e);
+        }
+      }
+      const localRoutines = await LocalStorageService.getRoutines(activeProfile.id);
+      setRoutines(localRoutines);
+    };
+
+    loadRoutines();
+  }, [activeProfile]);
 
   useEffect(() => {
     let interval: any = null;
@@ -90,6 +113,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       id: `routine_${Date.now()}`,
       title,
       target_muscle: targetMuscle,
+      created_by: activeProfile?.id,
       exercises: [],
     };
 

@@ -21,6 +21,7 @@ export interface WorkoutRoutine {
   id: string;
   title: string;
   target_muscle: string;
+  created_by?: string;
   exercises: ExerciseDefinition[];
 }
 
