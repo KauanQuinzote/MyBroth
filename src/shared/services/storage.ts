@@ -9,23 +9,14 @@ const ONLINE_KEY = '@mybroth_online_presence';
 
 export const DEFAULT_PROFILES: BroProfile[] = [
   {
-    id: 'bro-1-id',
-    name: 'Bro Alpha',
-    initials: 'BA',
+    id: 'kauan-profile-id',
+    name: 'Kauan Domingues',
+    initials: 'KD',
     avatar_color: '#0A84FF',
     pin_code: '1234',
-    bro_points: 250,
-    streak: 4,
-    last_workout_date: new Date().toISOString().split('T')[0],
-  },
-  {
-    id: 'bro-2-id',
-    name: 'Bro Beta',
-    initials: 'BB',
-    avatar_color: '#30D158',
-    pin_code: '4321',
-    bro_points: 190,
-    streak: 2,
+    email: 'kauandominguesdesouza@gmail.com',
+    bro_points: 0,
+    streak: 0,
     last_workout_date: new Date().toISOString().split('T')[0],
   },
 ];
@@ -40,7 +31,12 @@ export const LocalStorageService = {
         await AsyncStorage.setItem(PROFILES_KEY, JSON.stringify(DEFAULT_PROFILES));
         return DEFAULT_PROFILES;
       }
-      return JSON.parse(data);
+      const parsed: BroProfile[] = JSON.parse(data);
+      if (parsed.some((p) => p.name === 'Bro Alpha' || p.name === 'Bro Beta')) {
+        await AsyncStorage.setItem(PROFILES_KEY, JSON.stringify(DEFAULT_PROFILES));
+        return DEFAULT_PROFILES;
+      }
+      return parsed;
     } catch {
       return DEFAULT_PROFILES;
     }
