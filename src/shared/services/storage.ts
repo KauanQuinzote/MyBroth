@@ -50,14 +50,18 @@ export const LocalStorageService = {
     await AsyncStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
   },
 
-  async getRoutines(): Promise<WorkoutRoutine[]> {
+  async getRoutines(profileId?: string): Promise<WorkoutRoutine[]> {
     try {
       const data = await AsyncStorage.getItem(ROUTINES_KEY);
       if (!data) {
         await AsyncStorage.setItem(ROUTINES_KEY, JSON.stringify(DEFAULT_ROUTINES));
         return DEFAULT_ROUTINES;
       }
-      return JSON.parse(data);
+      const allRoutines: WorkoutRoutine[] = JSON.parse(data);
+      if (profileId) {
+        return allRoutines.filter((r) => !r.created_by || r.created_by === profileId);
+      }
+      return allRoutines;
     } catch {
       return DEFAULT_ROUTINES;
     }
