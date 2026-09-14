@@ -62,10 +62,15 @@ export const LocalStorageService = {
         return DEFAULT_ROUTINES;
       }
       const allRoutines: WorkoutRoutine[] = JSON.parse(data);
-      if (profileId) {
-        return allRoutines.filter((r) => !r.created_by || r.created_by === profileId);
+      // Remove todas as rotinas legadas sem o campo created_by
+      const validRoutines = allRoutines.filter((r) => Boolean(r.created_by));
+      if (validRoutines.length !== allRoutines.length) {
+        await AsyncStorage.setItem(ROUTINES_KEY, JSON.stringify(validRoutines));
       }
-      return allRoutines;
+      if (profileId) {
+        return validRoutines.filter((r) => r.created_by === profileId);
+      }
+      return validRoutines;
     } catch {
       return DEFAULT_ROUTINES;
     }
