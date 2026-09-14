@@ -18,7 +18,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onNavigateToWorkout,
   onNavigateToRoutines,
 }) => {
-  const { activeProfile, partnerProfile } = useAuth();
+  const { activeProfile, profiles } = useAuth();
   const { activeSession, routines, startWorkout } = useWorkout();
 
   if (!activeProfile) return null;
@@ -31,7 +31,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         {activeSession && (
           <ActiveWorkoutBanner session={activeSession} onNavigate={onNavigateToWorkout} />
         )}
-        <LeaderboardCard activeProfile={activeProfile} partnerProfile={partnerProfile} />
+        <LeaderboardCard profiles={profiles} activeProfile={activeProfile} />
         <QuickRoutinesList
           routines={routines}
           onSeeAll={onNavigateToRoutines}

@@ -1,10 +1,12 @@
 -- Script de criação das tabelas para o aplicativo MyBroth no Supabase
 
--- 1. Tabela de Usuários (Bro A e Bro B)
+-- 1. Tabela de Usuários (Profiles)
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
-  avatar_emoji TEXT NOT NULL DEFAULT '🏋️‍♂️',
+  email TEXT UNIQUE,
+  initials VARCHAR(4) NOT NULL DEFAULT 'KD',
+  avatar_color TEXT NOT NULL DEFAULT '#0A84FF',
   pin_code VARCHAR(4) NOT NULL DEFAULT '1234',
   bro_points INT NOT NULL DEFAULT 0,
   streak INT NOT NULL DEFAULT 0,
@@ -12,12 +14,11 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Inserir os 2 Bros padrão se a tabela estiver vazia
-INSERT INTO public.profiles (name, avatar_emoji, pin_code, bro_points, streak)
+-- Inserir o perfil padrão de Kauan Domingues se a tabela estiver vazia
+INSERT INTO public.profiles (id, name, email, initials, avatar_color, pin_code, bro_points, streak)
 VALUES 
-  ('Bro 1', '💪', '1234', 150, 3),
-  ('Bro 2', '🔥', '4321', 120, 2)
-ON CONFLICT DO NOTHING;
+  ('00000000-0000-0000-0000-000000000001', 'Kauan Domingues', 'kauandominguesdesouza@gmail.com', 'KD', '#0A84FF', '1234', 0, 0)
+ON CONFLICT (id) DO NOTHING;
 
 -- 2. Tabela de Fichas de Treino
 CREATE TABLE IF NOT EXISTS public.routines (
@@ -55,7 +56,17 @@ CREATE TABLE IF NOT EXISTS public.workout_logs (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Habilitar Realtime para workout_sessions e workout_logs
-ALTER PUBLICATION supabase_realtime ADD TABLE public.workout_sessions;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.workout_logs;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
+-- Habilitar Realtime para workout_sessions, workout_logs e profiles se ainda não estiverem na publicação
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'workout_sessions') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.workout_sessions;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'workout_logs') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.workout_logs;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'profiles') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
+  END IF;
+END $$;
+

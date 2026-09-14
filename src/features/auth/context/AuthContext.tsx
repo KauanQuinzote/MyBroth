@@ -9,6 +9,7 @@ interface AuthContextType {
   profiles: BroProfile[];
   isPartnerOnline: boolean;
   loginWithPin: (profileId: string, pin: string) => boolean;
+  registerProfile: (name: string, email: string, pinCode: string, avatarColor: string) => Promise<BroProfile>;
   logout: () => void;
   addBroPoints: (amount: number) => Promise<void>;
   incrementStreak: () => Promise<void>;
@@ -29,6 +30,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loadProfiles = async () => {
     setIsLoading(true);
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.from('profiles').select('*');
+        if (!error && data && data.length > 0) {
+          setProfiles(data as BroProfile[]);
+          await LocalStorageService.saveProfiles(data as BroProfile[]);
+          setIsLoading(false);
+          return;
+        }
+      } catch (e) {
+        console.warn('Erro ao carregar perfis do Supabase:', e);
+      }
+    }
     const stored = await LocalStorageService.getProfiles();
     setProfiles(stored);
     setIsLoading(false);
@@ -131,6 +145,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return false;
   };
 
+  const registerProfile = async (
+    name: string,
+    email: string,
+    pinCode: string,
+    avatarColor: string
+  ): Promise<BroProfile> => {
+    const nameParts = name.trim().split(' ');
+    const firstInitial = nameParts[0]?.[0] || 'B';
+    const lastInitial = nameParts.length > 1 ? nameParts[nameParts.length - 1]?.[0] : '';
+    const initials = (firstInitial + lastInitial).toUpperCase();
+
+    const newProfile: BroProfile = {
+      id: `profile_${Date.now()}`,
+      name: name.trim(),
+      email: email.trim(),
+      initials,
+      avatar_color: avatarColor || '#0A84FF',
+      pin_code: pinCode,
+      bro_points: 0,
+      streak: 0,
+    };
+
+    const updated = [...profiles, newProfile];
+    setProfiles(updated);
+    await LocalStorageService.saveProfiles(updated);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('profiles').insert({
+          id: newProfile.id,
+          name: newProfile.name,
+          email: newProfile.email,
+          initials: newProfile.initials,
+          avatar_color: newProfile.avatar_color,
+          pin_code: newProfile.pin_code,
+          bro_points: 0,
+          streak: 0,
+        });
+      } catch (e) {
+        console.warn('Erro ao inserir perfil no Supabase:', e);
+      }
+    }
+
+    return newProfile;
+  };
+
   const logout = () => {
     if (activeProfile) {
       LocalStorageService.setProfileOnlineState(activeProfile.id, false);
@@ -182,6 +242,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         profiles,
         isPartnerOnline,
         loginWithPin,
+        registerProfile,
         logout,
         addBroPoints,
         incrementStreak,

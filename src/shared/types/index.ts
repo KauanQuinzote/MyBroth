@@ -6,6 +6,8 @@ export interface BroProfile {
   pin_code: string;
   bro_points: number;
   streak: number;
+  email?: string;
+  supabase_user_id?: string;
   last_workout_date?: string;
 }
 
