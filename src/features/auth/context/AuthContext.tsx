@@ -12,6 +12,7 @@ interface AuthContextType {
   logout: () => void;
   addBroPoints: (amount: number) => Promise<void>;
   incrementStreak: () => Promise<void>;
+  registerProfile: (data: Omit<BroProfile, 'id' | 'bro_points' | 'streak'>) => Promise<BroProfile>;
   isLoading: boolean;
 }
 
@@ -174,6 +175,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await LocalStorageService.saveProfiles(updatedProfiles);
   };
 
+  const registerProfile = async (
+    data: Omit<BroProfile, 'id' | 'bro_points' | 'streak'>
+  ): Promise<BroProfile> => {
+    const id = 'bro_' + Date.now();
+    const created: BroProfile = {
+      id,
+      bro_points: 0,
+      streak: 0,
+      ...data,
+    };
+    const updated = [...profiles, created];
+    setProfiles(updated);
+    await LocalStorageService.saveProfiles(updated);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('profiles').insert([
+          {
+            id: created.id,
+            name: created.name,
+            initials: created.initials,
+            avatar_color: created.avatar_color,
+            pin_code: created.pin_code,
+            email: created.email,
+            bro_points: 0,
+            streak: 0,
+          },
+        ]);
+      } catch (err) {
+        console.warn('Failed to sync profile to cloud:', err);
+      }
+    }
+    return created;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -185,6 +221,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         addBroPoints,
         incrementStreak,
+        registerProfile,
         isLoading,
       }}
     >

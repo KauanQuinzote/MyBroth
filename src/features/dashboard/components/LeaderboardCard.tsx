@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Trophy, Award } from 'lucide-react-native';
+import { View, Text } from 'react-native';
+import { Trophy, Award } from 'lucide-react-native';
 import { BroProfile } from '../../../shared/types';
 
 interface LeaderboardCardProps {

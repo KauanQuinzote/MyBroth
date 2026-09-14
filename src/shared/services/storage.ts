@@ -32,9 +32,17 @@ export const LocalStorageService = {
         return DEFAULT_PROFILES;
       }
       const parsed: BroProfile[] = JSON.parse(data);
-      if (parsed.some((p) => p.name === 'Bro Alpha' || p.name === 'Bro Beta')) {
-        await AsyncStorage.setItem(PROFILES_KEY, JSON.stringify(DEFAULT_PROFILES));
-        return DEFAULT_PROFILES;
+      const cleaned = parsed.filter(
+        (p) =>
+          !p.name.toLowerCase().includes('alpha') &&
+          !p.name.toLowerCase().includes('beta') &&
+          !p.id.toLowerCase().includes('alpha') &&
+          !p.id.toLowerCase().includes('beta')
+      );
+      if (cleaned.length !== parsed.length || cleaned.length === 0) {
+        const finalProfiles = cleaned.length > 0 ? cleaned : DEFAULT_PROFILES;
+        await AsyncStorage.setItem(PROFILES_KEY, JSON.stringify(finalProfiles));
+        return finalProfiles;
       }
       return parsed;
     } catch {

@@ -4,6 +4,7 @@ export interface BroProfile {
   initials: string;
   avatar_color: string;
   pin_code: string;
+  email?: string;
   bro_points: number;
   streak: number;
   last_workout_date?: string;

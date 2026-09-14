@@ -3,16 +3,18 @@ import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { BroProfile } from '../../../shared/types';
 import { PinLoginModal } from '../components/PinLoginModal';
-import { Award, ChevronRight } from 'lucide-react-native';
+import { CreateProfileModal } from '../components/CreateProfileModal';
+import { Award, ChevronRight, UserPlus } from 'lucide-react-native';
 
 export const ProfileSelectScreen: React.FC = () => {
-  const { profiles, loginWithPin } = useAuth();
+  const { profiles, loginWithPin, registerProfile } = useAuth();
   const [selectedProfile, setSelectedProfile] = useState<BroProfile | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [pinModalVisible, setPinModalVisible] = useState(false);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
 
   const handleSelect = (profile: BroProfile) => {
     setSelectedProfile(profile);
-    setModalVisible(true);
+    setPinModalVisible(true);
   };
 
   return (
@@ -46,15 +48,34 @@ export const ProfileSelectScreen: React.FC = () => {
             <ChevronRight color="#64748B" size={20} />
           </TouchableOpacity>
         ))}
+
+        <TouchableOpacity
+          className="flex-row items-center justify-center bg-[#161B26] border border-dashed border-[#0A84FF] rounded-2xl p-5 gap-3 mt-2"
+          onPress={() => setCreateModalVisible(true)}
+          activeOpacity={0.8}
+        >
+          <UserPlus color="#0A84FF" size={20} />
+          <Text className="text-[#0A84FF] font-bold text-base">+ Criar Perfil de Bro</Text>
+        </TouchableOpacity>
       </View>
 
       <PinLoginModal
-        visible={modalVisible}
+        visible={pinModalVisible}
         profile={selectedProfile}
-        onClose={() => setModalVisible(false)}
+        onClose={() => setPinModalVisible(false)}
         onSuccess={(profileId, pin) => {
-          setModalVisible(false);
+          setPinModalVisible(false);
           loginWithPin(profileId, pin);
+        }}
+      />
+
+      <CreateProfileModal
+        visible={createModalVisible}
+        onClose={() => setCreateModalVisible(false)}
+        onSubmit={async (data) => {
+          const created = await registerProfile(data);
+          setSelectedProfile(created);
+          setCreateModalVisible(false);
         }}
       />
     </ScrollView>
