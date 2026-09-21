@@ -26,9 +26,9 @@ export const NudgeModal: React.FC<NudgeModalProps> = ({ onReplyPress }) => {
     SpeechService.speak(activeIncomingNudge.nudge_text);
   };
 
-  const handleClose = () => {
+  const handleClose = async () => {
     SpeechService.stop();
-    dismissIncomingNudge();
+    await dismissIncomingNudge();
   };
 
   return (
