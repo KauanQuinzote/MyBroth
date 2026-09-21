@@ -2,7 +2,7 @@
 
 - **Feature**: Widget Neon de Presença de Bros (0 a N Online / Treinando)
 - **Branch**: `feature/online-bro-widget-redesign`
-- **Status**: Draft (Refatorado via `/grill-with-docs`)
+- **Status**: Concluída (100% Implementada)
 
 ---
 
