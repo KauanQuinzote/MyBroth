@@ -5,7 +5,6 @@ const PROFILES_KEY = '@mybroth_profiles';
 const SESSIONS_KEY = '@mybroth_sessions';
 const SETS_KEY = '@mybroth_sets';
 const ROUTINES_KEY = '@mybroth_routines';
-const ONLINE_KEY = '@mybroth_online_presence';
 
 export const DEFAULT_PROFILES: BroProfile[] = [
   {
@@ -144,25 +143,5 @@ export const LocalStorageService = {
     } catch {
       return null;
     }
-  },
-
-  // --- Presença em Tempo Real ---
-  async getOnlinePresenceMap(): Promise<Record<string, number>> {
-    try {
-      const data = await AsyncStorage.getItem(ONLINE_KEY);
-      return data ? JSON.parse(data) : {};
-    } catch {
-      return {};
-    }
-  },
-
-  async setProfileOnlineState(profileId: string, isOnline: boolean): Promise<void> {
-    const map = await this.getOnlinePresenceMap();
-    if (isOnline) {
-      map[profileId] = Date.now();
-    } else {
-      delete map[profileId];
-    }
-    await AsyncStorage.setItem(ONLINE_KEY, JSON.stringify(map));
   },
 };

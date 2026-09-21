@@ -119,7 +119,7 @@ const MainNavigation: React.FC = () => {
 
 export default function App() {
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider style={{ flex: 1, backgroundColor: '#0A0D14' }}>
       <AuthProvider>
         <WorkoutProvider>
           <BromanceProvider>

@@ -17,5 +17,19 @@
   - Telas > 150 LOC: Devem ser divididas em `[Feature]Top`, `[Feature]Mid` e `[Feature]Bottom` (e sub-componentes específicos como Modais/Cards isolados).
 - **Responsabilidade Única**: O arquivo principal `Screen.tsx` de uma feature deve apenas orquestrar os sub-componentes e gerenciar estados globais.
 
-## 4. Integração com Skills
-- O desenvolvimento DEVE consultar e respeitar as especificações contidas no repositório `docs/skills/`.
+## 4. Metodologia Spec-Driven & Skills Matt Pocock (`docs/skills/`)
+Todo o desenvolvimento de novas funcionalidades, refatorações ou correções complexas DEVE seguir estritamente o ciclo de vida Matt Pocock:
+
+0. **Git Branch Dedicada**: Antes de qualquer trabalho, criar uma nova branch a partir da `main` no formato `feature/<spec-slug>`.
+1. **Entrevista e Alinhamento (`/grill-with-docs` / `/grill-me`)**:
+   - Resolução de ambiguidades e tomada de decisões via ferramenta interativa `ask_question` (múltipla escolha com campo texto livre "Outro").
+2. **Especificação Técnica (`/to-spec`)**:
+   - Criação da especificação detalhada em `documentation/<feature>-spec.md`.
+3. **Decomposição em Tickets Tracer-Bullet (`/to-tickets`)**:
+   - Criação dos tickets individuais com dependências explicitadas sob `.scratch/<feature>/issues/01-<slug>.md`.
+4. **Implementação Test-Driven (`/implement` + `/tdd`)**:
+   - Desenvolvimento obrigatoriamente ciclo por ciclo: **Red** (teste que falha) -> **Green** (código mínimo) -> **Refactor** (otimização).
+   - Testes automatizados em Jest + React Native Testing Library.
+5. **Revisão de Código (`/code-review`)**:
+   - Validação dos diffs sob 2 eixos: **Standards** (padrões de código) e **Spec** (fidelidade aos requisitos) antes da finalização.
+

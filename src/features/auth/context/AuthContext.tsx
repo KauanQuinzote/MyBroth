@@ -3,11 +3,14 @@ import { BroProfile } from '../../../shared/types';
 import { LocalStorageService, DEFAULT_PROFILES } from '../../../shared/services/storage';
 import { supabase, isSupabaseConfigured } from '../../../shared/services/supabaseClient';
 
+export type PartnerPresenceStatus = 'ONLINE' | 'TRAINING' | 'OFFLINE';
+
 interface AuthContextType {
   activeProfile: BroProfile | null;
   partnerProfile: BroProfile | null;
   profiles: BroProfile[];
   isPartnerOnline: boolean;
+  partnerStatus: PartnerPresenceStatus;
   loginWithPin: (profileId: string, pin: string) => boolean;
   logout: () => void;
   addBroPoints: (amount: number) => Promise<void>;
@@ -22,6 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profiles, setProfiles] = useState<BroProfile[]>(DEFAULT_PROFILES);
   const [activeProfile, setActiveProfile] = useState<BroProfile | null>(null);
   const [isPartnerOnline, setIsPartnerOnline] = useState(false);
+  const [partnerStatus, setPartnerStatus] = useState<PartnerPresenceStatus>('OFFLINE');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -30,8 +34,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loadProfiles = async () => {
     setIsLoading(true);
-    const stored = await LocalStorageService.getProfiles();
-    setProfiles(stored);
+    let loadedProfiles: BroProfile[] = [];
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.from('profiles').select('*');
+        if (!error && data && data.length > 0) {
+          loadedProfiles = data as BroProfile[];
+          await LocalStorageService.saveProfiles(loadedProfiles);
+        } else {
+          loadedProfiles = await LocalStorageService.getProfiles();
+        }
+      } catch (err) {
+        console.warn('Failed to load profiles from Supabase cloud, falling back to local storage:', err);
+        loadedProfiles = await LocalStorageService.getProfiles();
+      }
+    } else {
+      loadedProfiles = await LocalStorageService.getProfiles();
+    }
+
+    setProfiles(loadedProfiles);
     setIsLoading(false);
   };
 
@@ -39,50 +61,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ? profiles.find((p) => p.id !== activeProfile.id) || null
     : null;
 
-  // Transmissão e Escuta de Presença via Supabase Presence & Storage & BroadcastChannel
+  // Gerenciamento de Presença em Tempo Real via Supabase Presence (WebSockets)
   useEffect(() => {
     if (!activeProfile) {
       setIsPartnerOnline(false);
+      setPartnerStatus('OFFLINE');
       return;
     }
 
-    const checkPartnerOnline = async () => {
-      if (!partnerProfile) return;
-      // Atualiza o heartbeat do perfil ativo continuamente
-      await LocalStorageService.setProfileOnlineState(activeProfile.id, true);
-
-      const presenceMap = await LocalStorageService.getOnlinePresenceMap();
-      const lastSeen = presenceMap[partnerProfile.id];
-      // Considera online se marcou presença nos últimos 60s
-      const online = Boolean(lastSeen && Date.now() - lastSeen < 60000);
-      setIsPartnerOnline(online);
-    };
-
-    checkPartnerOnline();
-    const interval = setInterval(checkPartnerOnline, 3000);
-
-    // Suporte a BroadcastChannel para sincronização instantânea em abas web no mesmo ambiente dev
-    let bc: any = null;
-    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-      try {
-        bc = new (window as any).BroadcastChannel('mybroth_presence_channel');
-        bc.onmessage = (event: any) => {
-          if (event.data && event.data.profileId === partnerProfile?.id) {
-            if (event.data.type === 'ONLINE') {
-              setIsPartnerOnline(true);
-            } else if (event.data.type === 'OFFLINE') {
-              setIsPartnerOnline(false);
-            }
-          }
-        };
-        bc.postMessage({ type: 'ONLINE', profileId: activeProfile.id });
-      } catch (e) {
-        console.warn('BroadcastChannel error:', e);
-      }
-    }
-
-    // Se o Supabase estiver configurado, usa canais Supabase Presence
     let presenceChannel: any = null;
+
     if (isSupabaseConfigured && supabase) {
       presenceChannel = supabase.channel('bro_presence');
 
@@ -90,32 +78,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .on('presence', { event: 'sync' }, () => {
           const state = presenceChannel.presenceState();
           if (partnerProfile) {
-            const hasPartner = Object.values(state).some((presences: any) =>
-              presences.some((p: any) => p.user_id === partnerProfile.id)
-            );
-            setIsPartnerOnline(hasPartner);
+            let foundStatus: PartnerPresenceStatus = 'OFFLINE';
+            let isOnline = false;
+
+            Object.values(state).forEach((presences: any) => {
+              presences.forEach((p: any) => {
+                if (p.user_id === partnerProfile.id) {
+                  isOnline = true;
+                  foundStatus = p.status || 'ONLINE';
+                }
+              });
+            });
+
+            setIsPartnerOnline(isOnline);
+            setPartnerStatus(isOnline ? foundStatus : 'OFFLINE');
           }
         })
         .subscribe(async (status: string) => {
           if (status === 'SUBSCRIBED') {
-            await presenceChannel.track({
+            const trackPayload = {
               user_id: activeProfile.id,
-              online_at: new Date().toISOString(),
-            });
+              user_name: activeProfile.name,
+              status: 'ONLINE',
+              updated_at: new Date().toISOString(),
+            };
+
+            await presenceChannel.track(trackPayload);
+
+            // Log server-side via Edge Function
+            try {
+              if (supabase?.functions) {
+                await supabase.functions.invoke('presence-logger', {
+                  body: trackPayload,
+                });
+              }
+            } catch (err) {
+              console.warn('Presence logger invocation failed:', err);
+            }
           }
         });
     }
 
     return () => {
-      clearInterval(interval);
-      LocalStorageService.setProfileOnlineState(activeProfile.id, false);
-      if (bc) {
-        try {
-          bc.postMessage({ type: 'OFFLINE', profileId: activeProfile.id });
-          bc.close();
-        } catch (e) {}
-      }
       if (presenceChannel && supabase) {
+        if (activeProfile && supabase.functions) {
+          supabase.functions.invoke('presence-logger', {
+            body: {
+              user_id: activeProfile.id,
+              user_name: activeProfile.name,
+              status: 'OFFLINE',
+              updated_at: new Date().toISOString(),
+            },
+          }).catch((err) => console.warn('Offline presence logger invocation failed:', err));
+        }
         presenceChannel.untrack();
         supabase.removeChannel(presenceChannel);
       }
@@ -126,18 +141,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const target = profiles.find((p) => p.id === profileId);
     if (target && target.pin_code === pin) {
       setActiveProfile(target);
-      LocalStorageService.setProfileOnlineState(target.id, true);
       return true;
     }
     return false;
   };
 
   const logout = () => {
-    if (activeProfile) {
-      LocalStorageService.setProfileOnlineState(activeProfile.id, false);
-    }
     setActiveProfile(null);
     setIsPartnerOnline(false);
+    setPartnerStatus('OFFLINE');
   };
 
   const addBroPoints = async (amount: number) => {
@@ -217,6 +229,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         partnerProfile,
         profiles,
         isPartnerOnline,
+        partnerStatus,
         loginWithPin,
         logout,
         addBroPoints,
@@ -231,3 +244,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 export const useAuth = () => useContext(AuthContext);
+

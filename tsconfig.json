@@ -1,7 +1,9 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    "jsxImportSource": "nativewind",
+    "types": ["jest", "node", "nativewind/types"]
   },
   "exclude": ["node_modules", "skills", "docs/skills", "app_temp", ".expo", "dist"]
 }
