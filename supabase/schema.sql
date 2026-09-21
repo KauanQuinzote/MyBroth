@@ -55,7 +55,21 @@ CREATE TABLE IF NOT EXISTS public.workout_logs (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Habilitar Realtime para workout_sessions e workout_logs
+-- 5. Tabela de Provocações (Taunts/Nudges)
+CREATE TABLE IF NOT EXISTS public.nudges (
+  id TEXT PRIMARY KEY,
+  sender_id TEXT NOT NULL,
+  sender_name TEXT NOT NULL,
+  sender_initials TEXT,
+  receiver_id TEXT NOT NULL,
+  nudge_text TEXT NOT NULL,
+  category TEXT NOT NULL,
+  read_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Habilitar Realtime para workout_sessions, workout_logs, profiles e nudges
 ALTER PUBLICATION supabase_realtime ADD TABLE public.workout_sessions;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.workout_logs;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.nudges;
