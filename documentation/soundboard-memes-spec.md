@@ -2,7 +2,7 @@
 
 - **Feature**: Soundboard de Memes & Provocações em Áudio (MyInstants / Custom MP3)
 - **Branch**: `feature/soundboard-memes-taunts`
-- **Status**: Draft (Refatorado via `/grill-with-docs`)
+- **Status**: Concluída (100% Implementada)
 
 ---
 
