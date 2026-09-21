@@ -2,7 +2,7 @@
 
 - **Feature**: Transmissão em Tempo Real & Entrega Offline de Provocações (Taunts/Nudges)
 - **Branch**: `feature/realtime-taunts-system`
-- **Status**: Draft (Refatorado via `/grill-with-docs`)
+- **Status**: Concluída (100% Implementada)
 
 ---
 
