@@ -5,12 +5,14 @@ import { useWorkout } from '../../workout/context/WorkoutContext';
 import { Activity, Dumbbell, UserCheck } from 'lucide-react-native';
 
 export const LivePartnerBadge: React.FC = () => {
-  const { partnerProfile, isPartnerOnline } = useAuth();
+  const { partnerProfile, isPartnerOnline, partnerStatus } = useAuth();
   const { partnerActiveSession } = useWorkout();
 
   if (!partnerProfile) return null;
 
-  const isInWorkout = Boolean(partnerActiveSession && partnerActiveSession.status === 'in_progress');
+  const isInWorkout = Boolean(
+    partnerStatus === 'TRAINING' || (partnerActiveSession && partnerActiveSession.status === 'in_progress')
+  );
 
   return (
     <View
@@ -40,7 +42,7 @@ export const LivePartnerBadge: React.FC = () => {
         {isInWorkout ? (
           <View className="flex-row items-center bg-emerald-500/20 px-2.5 py-1 rounded-xl gap-1.5 border border-emerald-500/30">
             <View className="w-2 h-2 rounded-full bg-[#30D158]" />
-            <Text className="text-[#30D158] text-[11px] font-bold">NO TREINO</Text>
+            <Text className="text-[#30D158] text-[11px] font-bold">TREINANDO AGORA</Text>
           </View>
         ) : isPartnerOnline ? (
           <View className="flex-row items-center bg-[#0A84FF]/20 px-2.5 py-1 rounded-xl gap-1.5 border border-[#0A84FF]/30">

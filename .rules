@@ -1,5 +1,11 @@
 # MyBroth - Regras do Projeto (.rules)
 
 - **Regras Principais**: Consulte [docs/RULES.md](./docs/RULES.md) para diretrizes de arquitetura Feature-Based.
-- **Design System Apple**: Consulte [docs/DESIGN.md](./docs/DESIGN.md) para o guia de estilo Apple Minimalist e Política Zero Emojis.
-- **Especificações de Skills**: Siga sempre o repositório `docs/skills/`.
+- **Git Branch por Spec**: Para cada especificação/funcionalidade, DEVE-SE criar uma nova branch git dedicada a partir da `main` (ex: `feature/<spec-slug>`) antes de iniciar o desenvolvimento.
+- **Fluxo Oficial Matt Pocock (Spec-Driven)**: Siga rigorosamente a esteira completa contida em `docs/skills/`:
+  1. **`/grill-with-docs` / `/grill-me`**: Alinhamento de modelo de domínio e entrevistas interativas utilizando a ferramenta `ask_question` (opções de escolha direta + campo texto livre).
+  2. **`/to-spec`**: Especificação funcional e técnica detalhada em `documentation/<feature>-spec.md`.
+  3. **`/to-tickets`**: Quebra em tickets tracer-bullet armazenados em `.scratch/<feature>/issues/01-<slug>.md`, cada um com critérios de aceitação e bordas de bloqueio.
+  4. **`/implement` + `/tdd`**: Desenvolvimento dirigido por testes (**Red** -> **Green** -> **Refactor**) para cada ticket, utilizando Jest + React Native Testing Library.
+  5. **`/code-review`**: Revisão em 2 eixos (Standards e Spec) antes da finalização.
+
