@@ -2,7 +2,7 @@
 
 - **Feature**: Real-Time Online Presence
 - **Branch**: `feature/online-presence-system`
-- **Status**: Draft (Refatorado via `/grill-with-docs`)
+- **Status**: Concluída (100% Implementada)
 
 ---
 
