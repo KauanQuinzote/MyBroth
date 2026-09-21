@@ -5,12 +5,26 @@ import { supabase, isSupabaseConfigured } from '../../../shared/services/supabas
 
 export type PartnerPresenceStatus = 'ONLINE' | 'TRAINING' | 'OFFLINE';
 
+export interface BroPresenceState {
+  user_id: string;
+  user_name: string;
+  avatar_color?: string;
+  initials?: string;
+  status: PartnerPresenceStatus;
+  routine_name?: string;
+  current_exercise?: string;
+  current_weight_kg?: number;
+  current_set?: number;
+  updated_at: string;
+}
+
 interface AuthContextType {
   activeProfile: BroProfile | null;
   partnerProfile: BroProfile | null;
   profiles: BroProfile[];
   isPartnerOnline: boolean;
   partnerStatus: PartnerPresenceStatus;
+  onlineBros: BroPresenceState[];
   loginWithPin: (profileId: string, pin: string) => boolean;
   logout: () => void;
   addBroPoints: (amount: number) => Promise<void>;
@@ -26,6 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [activeProfile, setActiveProfile] = useState<BroProfile | null>(null);
   const [isPartnerOnline, setIsPartnerOnline] = useState(false);
   const [partnerStatus, setPartnerStatus] = useState<PartnerPresenceStatus>('OFFLINE');
+  const [onlineBros, setOnlineBros] = useState<BroPresenceState[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -77,21 +92,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       presenceChannel
         .on('presence', { event: 'sync' }, () => {
           const state = presenceChannel.presenceState();
-          if (partnerProfile) {
-            let foundStatus: PartnerPresenceStatus = 'OFFLINE';
-            let isOnline = false;
+          const collectedBros: BroPresenceState[] = [];
 
-            Object.values(state).forEach((presences: any) => {
-              presences.forEach((p: any) => {
-                if (p.user_id === partnerProfile.id) {
-                  isOnline = true;
-                  foundStatus = p.status || 'ONLINE';
-                }
-              });
+          Object.values(state).forEach((presences: any) => {
+            presences.forEach((p: any) => {
+              if (p.user_id !== activeProfile.id) {
+                const profileMatch = profiles.find((prof) => prof.id === p.user_id);
+                collectedBros.push({
+                  user_id: p.user_id,
+                  user_name: p.user_name || profileMatch?.name || 'Bro',
+                  avatar_color: profileMatch?.avatar_color,
+                  initials: profileMatch?.initials || (p.user_name ? p.user_name.slice(0, 2).toUpperCase() : 'BR'),
+                  status: p.status || 'ONLINE',
+                  routine_name: p.routine_name,
+                  current_exercise: p.current_exercise,
+                  current_weight_kg: p.current_weight_kg,
+                  current_set: p.current_set,
+                  updated_at: p.updated_at || new Date().toISOString(),
+                });
+              }
             });
+          });
 
-            setIsPartnerOnline(isOnline);
-            setPartnerStatus(isOnline ? foundStatus : 'OFFLINE');
+          setOnlineBros(collectedBros);
+
+          if (partnerProfile) {
+            const partnerPresence = collectedBros.find((b) => b.user_id === partnerProfile.id);
+            if (partnerPresence) {
+              setIsPartnerOnline(true);
+              setPartnerStatus(partnerPresence.status);
+            } else {
+              setIsPartnerOnline(false);
+              setPartnerStatus('OFFLINE');
+            }
           }
         })
         .subscribe(async (status: string) => {
@@ -150,6 +183,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setActiveProfile(null);
     setIsPartnerOnline(false);
     setPartnerStatus('OFFLINE');
+    setOnlineBros([]);
   };
 
   const addBroPoints = async (amount: number) => {
@@ -230,6 +264,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         profiles,
         isPartnerOnline,
         partnerStatus,
+        onlineBros,
         loginWithPin,
         logout,
         addBroPoints,
