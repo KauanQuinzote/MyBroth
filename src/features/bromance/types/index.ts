@@ -15,6 +15,7 @@ export interface BromanceNudgeLog {
   receiver_id: string;
   nudge_text: string;
   category: NudgeCategory;
+  audio_url?: string | null;
   read_at?: string | null;
   created_at: string;
 }

@@ -9,7 +9,7 @@ const NUDGES_STORAGE_KEY = '@mybroth_nudges_history';
 interface BromanceContextType {
   nudgeHistory: BromanceNudgeLog[];
   activeIncomingNudge: BromanceNudgeLog | null;
-  sendNudge: (text: string, category: any) => Promise<void>;
+  sendNudge: (text: string, category: any, audioUrl?: string) => Promise<void>;
   dismissIncomingNudge: () => Promise<void>;
 }
 
@@ -98,7 +98,7 @@ export const BromanceProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
-  const sendNudge = async (text: string, category: any) => {
+  const sendNudge = async (text: string, category: any, audioUrl?: string) => {
     if (!activeProfile || !partnerProfile) return;
 
     const newNudge: BromanceNudgeLog = {
@@ -109,6 +109,7 @@ export const BromanceProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       receiver_id: partnerProfile.id,
       nudge_text: text,
       category,
+      audio_url: audioUrl || null,
       read_at: null,
       created_at: new Date().toISOString(),
     };
@@ -137,6 +138,7 @@ export const BromanceProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             receiver_id: newNudge.receiver_id,
             nudge_text: newNudge.nudge_text,
             category: newNudge.category,
+            audio_url: newNudge.audio_url,
             read_at: null,
             created_at: newNudge.created_at,
           },

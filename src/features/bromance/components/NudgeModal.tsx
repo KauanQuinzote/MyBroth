@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, Modal } from 'react-native';
 import { useBromance } from '../context/BromanceContext';
-import { SpeechService } from '../services/speechService';
-import { Flame, X, MessageSquareReply, Volume2, VolumeX } from 'lucide-react-native';
+import { AudioService } from '../services/audioService';
+import { Flame, X, MessageSquareReply, Volume2 } from 'lucide-react-native';
 
 interface NudgeModalProps {
   onReplyPress?: () => void;
@@ -13,21 +13,21 @@ export const NudgeModal: React.FC<NudgeModalProps> = ({ onReplyPress }) => {
 
   useEffect(() => {
     if (activeIncomingNudge) {
-      // Fala automaticamente a frase da provocação assim que o modal abre
-      SpeechService.speak(activeIncomingNudge.nudge_text);
+      // Reproduz o áudio MP3 (se houver audio_url) ou fala via TTS
+      AudioService.playUrl(activeIncomingNudge.audio_url, activeIncomingNudge.nudge_text);
     } else {
-      SpeechService.stop();
+      AudioService.stop();
     }
   }, [activeIncomingNudge]);
 
   if (!activeIncomingNudge) return null;
 
   const handleReplayAudio = () => {
-    SpeechService.speak(activeIncomingNudge.nudge_text);
+    AudioService.playUrl(activeIncomingNudge.audio_url, activeIncomingNudge.nudge_text);
   };
 
   const handleClose = async () => {
-    SpeechService.stop();
+    await AudioService.stop();
     await dismissIncomingNudge();
   };
 
