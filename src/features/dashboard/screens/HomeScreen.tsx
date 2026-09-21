@@ -2,7 +2,7 @@ import React from 'react';
 import { View, ScrollView } from 'react-native';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useWorkout } from '../../workout/context/WorkoutContext';
-import { LivePartnerBadge } from '../../gamification';
+import { NeonBroPresenceWidget } from '../../gamification';
 import { HeaderBar } from '../../../shared/components/HeaderBar';
 import { ActiveWorkoutBanner } from '../components/ActiveWorkoutBanner';
 import { LeaderboardCard } from '../components/LeaderboardCard';
@@ -27,7 +27,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     <View className="flex-1 bg-[#0A0D14]">
       <HeaderBar />
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        <LivePartnerBadge />
+        <NeonBroPresenceWidget />
         {activeSession && (
           <ActiveWorkoutBanner session={activeSession} onNavigate={onNavigateToWorkout} />
         )}
