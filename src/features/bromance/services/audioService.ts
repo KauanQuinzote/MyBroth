@@ -1,11 +1,11 @@
-import { Audio } from 'expo-av';
+import { createAudioPlayer, AudioPlayer, setAudioModeAsync } from 'expo-audio';
 import { SpeechService } from './speechService';
 
-let currentSound: Audio.Sound | null = null;
+let currentPlayer: AudioPlayer | null = null;
 
 export const AudioService = {
   /**
-   * Reproduz um arquivo de áudio remoto (MP3/WAV) via expo-av.
+   * Reproduz um arquivo de áudio remoto (MP3/WAV) via expo-audio.
    * Se a URL falhar ou estiver ausente, executa o SpeechService (TTS) como fallback.
    */
   async playUrl(url?: string | null, fallbackText?: string): Promise<boolean> {
@@ -17,30 +17,27 @@ export const AudioService = {
     }
 
     try {
-      if (Audio.setAudioModeAsync) {
-        await Audio.setAudioModeAsync({
-          playsInSilentModeIOS: true,
-          shouldDuckAndroid: true,
-        });
+      if (setAudioModeAsync) {
+        await setAudioModeAsync({
+          playsInSilentMode: true,
+          interruptionMode: 'duckOthers',
+        }).catch(() => {});
       }
 
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: url },
-        { shouldPlay: true }
-      );
+      const player = createAudioPlayer({ uri: url });
+      currentPlayer = player;
 
-      currentSound = sound;
-
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) {
-          sound.unloadAsync().catch(() => {});
-          if (currentSound === sound) currentSound = null;
+      player.addListener('playbackStatusUpdate', (status) => {
+        if (status.didJustFinish) {
+          player.remove();
+          if (currentPlayer === player) currentPlayer = null;
         }
       });
 
+      player.play();
       return true;
     } catch (error) {
-      console.warn('Failed to load MP3 audio via expo-av, falling back to TTS:', error);
+      console.warn('Failed to load audio via expo-audio, falling back to TTS:', error);
       if (fallbackText) SpeechService.speak(fallbackText);
       return false;
     }
@@ -51,13 +48,14 @@ export const AudioService = {
    */
   async stop(): Promise<void> {
     SpeechService.stop();
-    if (currentSound) {
+    if (currentPlayer) {
       try {
-        await currentSound.unloadAsync();
+        currentPlayer.pause();
+        currentPlayer.remove();
       } catch (err) {
         // Ignora erros de descarte
       }
-      currentSound = null;
+      currentPlayer = null;
     }
   },
 };

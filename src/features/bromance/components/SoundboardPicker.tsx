@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { MEME_SOUNDBOARD, SoundboardMemeItem } from '../data/soundboardData';
 import { useBromance } from '../context/BromanceContext';
 import { Volume2, Music, Send, Link as LinkIcon, Search } from 'lucide-react-native';
@@ -60,15 +60,15 @@ export const SoundboardPicker: React.FC = () => {
         />
       </View>
 
-      {/* Grid de Memes da Lista MYINSTANTS_AUDIOS */}
-      <View className="flex-row flex-wrap gap-2 mb-5 max-h-[320px] overflow-hidden">
+      {/* Grid de Memes */}
+      <View className="flex-row flex-wrap justify-between gap-y-2 mb-5">
         {filteredMemes.map((meme) => {
           const isSending = sendingId === meme.id;
           const displayName = meme.name || meme.title || meme.id;
           return (
             <TouchableOpacity
               key={meme.id}
-              className={`p-3 rounded-2xl border flex-row items-center gap-2.5 w-[48%] mb-1 ${
+              className={`p-3 rounded-2xl border flex-row items-center gap-2.5 w-[48%] ${
                 isSending
                   ? 'bg-[#00F0FF]/20 border-[#00F0FF]'
                   : 'bg-[#161B26] border-[#262F42] active:border-[#00F0FF]/50'
