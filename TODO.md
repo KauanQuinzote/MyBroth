@@ -19,6 +19,9 @@
     - **Opção B (Supabase Cloud)**: Conectar `EXPO_PUBLIC_SUPABASE_URL` e `EXPO_PUBLIC_SUPABASE_ANON_KEY` com canais de `Presence` e `Broadcast`.
 
 ### 3. Comunidades & Privacidade de Bros
+- [ ] **Sincronização Dinâmica de Perfis do Supabase**:
+  - Garantir que o app carregue e liste todos os perfis cadastrados diretamente da tabela `profiles` do Supabase na inicialização (sem ficar restrito ao fallback local que só lista o usuário inicial).
+  - Tratar mapeamento de campos (`name`, `avatar_emoji` / `avatar_color`, `pin_code`, `initials`) para que bros como o Fábio e novos usuários apareçam imediatamente na seleção de perfil.
 - [ ] **Múltiplas Comunidades de Bros**: Possibilidade de criar várias comunidades/grupos de amigos.
   - Cada bro pode pertencer a 1..N comunidades.
   - Os treinos e atividades devem ser visíveis apenas para os membros das comunidades em que o bro participa (evitando que usuários desconhecidos vejam treinos).
