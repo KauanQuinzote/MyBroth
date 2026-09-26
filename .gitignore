@@ -12,3 +12,7 @@ web-build/
 
 # IDE / Antigravity
 app_temp
+
+# EAS Local Builds & APKs
+app/
+*.apk

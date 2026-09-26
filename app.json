@@ -10,13 +10,26 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.kauandomingues.gymbros",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/a4b1f5c0-6aa3-464d-966d-5e8e82e27b74"
     },
     "web": {
       "bundler": "metro",
@@ -25,6 +38,12 @@
     },
     "plugins": [
       "expo-audio"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "a4b1f5c0-6aa3-464d-966d-5e8e82e27b74"
+      }
+    },
+    "owner": "kauandomingues"
   }
 }

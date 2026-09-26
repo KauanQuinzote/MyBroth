@@ -3,7 +3,12 @@
 ## Prioridade Próxima
 
 ### 1. Rebranding & Nomenclaturas
-- [ ] **Renomear Projeto**: Atualizar o nome do projeto para **GymBros** (em substituição a MyBroth).
+- [ ] **Renomear Projeto & App**:
+  - Atualizar o nome do projeto de **MyBroth** para **GymBros**.
+  - Remover `app_temp` do `app.json` (`name`, `slug`) e do `package.json` (`name`), definindo o nome exibido no celular como **GymBros**.
+- [ ] **Identidade Visual & Ícone do App**:
+  - Criar e configurar o ícone oficial do **GymBros** seguindo o padrão Apple Minimalist / Neon Dark (1024x1024 px).
+  - Configurar ícones adaptativos do Android (`android-icon-foreground.png`, `android-icon-background.png`, `monochromeImage`) e `splash-icon.png`.
 - [ ] **Renomear Romance para Chilling**: Atualizar a feature/seção de romance para **Chilling**.
 
 ### 2. Sincronização Real-time Cross-Device (PC <-> Celular)
@@ -40,6 +45,9 @@
   - Adicionar navegação por abas/filtros/chips de categorias no Soundboard para busca e seleção rápida.
 - [ ] **Adicionar Novos Áudios Salvos do MyInstants**:
   - Atualizar o objeto `MYINSTANTS_AUDIOS` e o catálogo do soundboard com os novos áudios/memes favoritados/salvos no MyInstants.
+- [ ] **Refatoração da Arquitetura de Áudios & Soundboard**:
+  - Melhorar a arquitetura e modularização dos dados de áudios (atualmente concentrados em um único arquivo monolítico `src/features/bromance/data/soundboardData.ts`).
+  - Separar os arquivos por categoria/domínio, criar schemas estritos de metadata (tags, duração aproximada, nível de zoeira/intensidade, autoria) e carregar de forma modular/dinâmica.
 - [ ] **Investigação & Fix de Áudio no Mobile vs. Web**:
   - Investigar por que os áudios do soundboard tocam normalmente na Web, mas não reproduzem no dispositivo físico / Expo Go Mobile.
   - Verificar compatibilidade de URLs externas/streaming de MP3, configuração do modo de áudio no iOS/Android (`setAudioModeAsync`, flags de silent mode / background audio) e possíveis bloqueios de rede/CORS no player nativo.
