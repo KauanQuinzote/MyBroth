@@ -19,7 +19,11 @@
   - Os treinos e atividades devem ser visíveis apenas para os membros das comunidades em que o bro participa (evitando que usuários desconhecidos vejam treinos).
 
 ### 4. Treinos & Cardio
+- [ ] **Tipos Avançados de Séries & Exercícios**:
+  - Registrar exercícios e séries especiais: **Bi-set**, **Drop-set**, **Aquecimento** (Warm-up / Feeder sets).
+  - Cada série/variação deve suportar suas próprias **cargas** e **repetições** personalizadas e independentes.
 - [ ] **Diferentes Tipos de Cardio**: Adicionar suporte a múltiplos tipos e modalidades de cardio no treino (esteira, bike, escada, corrida externa, etc., com métricas apropriadas como tempo, distância, calorias, velocidade).
+- [ ] **Aviso Sonoro de Fim de Descanso**: Tocar um som/efeito sonoro ou vibração automaticamente quando o timer de descanso entre séries/exercícios chegar a zero.
 - [ ] **Status do Treino em Tempo Real**: Ao clicar no ícone do bro na Home (ativo no treino), visualizar exatamente em qual momento do treino ele está (qual exercício, série/rep, peso, cardio em andamento, tempo decorrido).
 - [ ] **Dashboard de Evolução**: Painel completo para acompanhar o progresso e histórico de ganhos em exercícios (sobrecarga progressiva/1RM), peso corporal, cardio e frequência.
 
@@ -31,12 +35,25 @@
 - [ ] **Aba Chilling Reestruturada**: Separar a tela de Chilling em abas dedicadas:
   - Aba 1: Gravação e envio de áudios de voz.
   - Aba 2: Soundboard com botões de memes e efeitos sonoros.
+- [ ] **Classificação dos Áudios por Categorias**:
+  - Organizar e classificar o catálogo de áudios/memes em categorias (ex: Pesado/Hardcore, Frango/Zoeira, Brother/Motivação, etc.).
+  - Adicionar navegação por abas/filtros/chips de categorias no Soundboard para busca e seleção rápida.
+- [ ] **Adicionar Novos Áudios Salvos do MyInstants**:
+  - Atualizar o objeto `MYINSTANTS_AUDIOS` e o catálogo do soundboard com os novos áudios/memes favoritados/salvos no MyInstants.
+- [ ] **Investigação & Fix de Áudio no Mobile vs. Web**:
+  - Investigar por que os áudios do soundboard tocam normalmente na Web, mas não reproduzem no dispositivo físico / Expo Go Mobile.
+  - Verificar compatibilidade de URLs externas/streaming de MP3, configuração do modo de áudio no iOS/Android (`setAudioModeAsync`, flags de silent mode / background audio) e possíveis bloqueios de rede/CORS no player nativo.
 
 ### 6. Gamificação, Desafios & Conquistas
 - [ ] **Expansão de Conquistas (Achievements)**: Adicionar catálogo amplo de categorias e conquistas na gamificação (no mínimo 50 achievements divididos em categorias como Força, Constância, Social, Cardio, Desafios, etc.).
 - [ ] **Sistema de Desafios ("Verdade ou Desafio" / Bro Challenges)**:
   - Desafios valendo Bro Points ou apostas/prêmios personalizados definidos pelo emissor.
   - Fluxo de validação: o bro que completa o desafio submete comprovação e o bro desafiante precisa validar/aprovar para liberar os pontos/prêmio.
+
+### 7. DevOps, Qualidade & CI/CD
+- [ ] **CLI & Automação de Checagem em PRs**:
+  - Criar ferramenta CLI / script de validação de integridade (tipagem TypeScript, lint e suíte de testes unitários/integração).
+  - Configurar GitHub Actions workflow para executar automaticamente essa CLI/validação toda vez que um Pull Request for aberto ou atualizado no GitHub (`pull_request`).
 
 ---
 
