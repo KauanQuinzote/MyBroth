@@ -7,6 +7,7 @@ import { NudgeCategory, BromanceNudgeItem } from '../types';
 import { NudgeCategoryTabs } from '../components/NudgeCategoryTabs';
 import { NudgeCard } from '../components/NudgeCard';
 import { NudgeHistoryList } from '../components/NudgeHistoryList';
+import { SoundboardPicker } from '../components/SoundboardPicker';
 import { Skull } from 'lucide-react-native';
 
 export const BromanceScreen: React.FC = () => {
@@ -29,11 +30,15 @@ export const BromanceScreen: React.FC = () => {
         <View className="bg-[#161B26] p-5 mx-5 my-3 rounded-3xl border border-[#262F42]">
           <View className="flex-row items-center gap-2 mb-2">
             <Skull color="#FF453A" size={24} />
-            <Text className="text-white text-lg font-bold">Trash Talk</Text>
+            <Text className="text-white text-lg font-bold">Trash Talk & Soundboard</Text>
           </View>
           <Text className="text-slate-400 text-xs leading-relaxed">
-            Envie provocações instantâneas ao vivo para o seu bro. Escolha a categoria abaixo e toque em um card para disparar o alerta na tela dele!
+            Envie provocações instantâneas e efeitos sonoros virais para o seu bro. Escolha um meme abaixo ou digite o link do áudio!
           </Text>
+        </View>
+
+        <View className="px-5">
+          <SoundboardPicker />
         </View>
 
         <NudgeCategoryTabs selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
